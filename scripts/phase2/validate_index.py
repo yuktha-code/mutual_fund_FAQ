@@ -193,7 +193,7 @@ def run_smoke_tests(threshold: float = 0.40, top_k: int = 1, verbose: bool = Fal
         scheme_ok  = (test["expect_scheme"] is None) or (test["expect_scheme"] in top_scheme)
         fact_ok    = (test["expect_fact_type"] is None) or (test["expect_fact_type"] in top_facts)
 
-        passed_test = sim_ok and scheme_ok
+        passed_test = sim_ok and scheme_ok and fact_ok
         status = "PASS" if passed_test else "FAIL"
         if passed_test:
             passed += 1
@@ -212,6 +212,8 @@ def run_smoke_tests(threshold: float = 0.40, top_k: int = 1, verbose: bool = Fal
         sim_str = f"{top_sim:.4f}"
         print(f"[{status}] #{i:02d} {test['description']}")
         print(f"        similarity={sim_str}  scheme={top_scheme!r}  facts=[{top_facts}]")
+        if not fact_ok:
+            print(f"        ↳ FAIL: expected fact type '{test['expect_fact_type']}' missing")
         if not sim_ok:
             print(f"        ↳ FAIL: similarity {top_sim:.4f} below threshold {1-threshold:.2f}")
         if not scheme_ok:
