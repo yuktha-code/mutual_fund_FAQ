@@ -46,30 +46,35 @@ TESTS = [
         "expect_type":  "answer",
         "check_source": True,
         "description":  "Factual — exit load (Large Cap)",
+        "expect_scheme": "Mirae Asset Large Cap Fund",
     },
     {
         "query":        "What is the lock-in period for Mirae Asset ELSS Tax Saver Fund?",
         "expect_type":  "answer",
         "check_source": True,
         "description":  "Factual — lock-in (ELSS)",
+        "expect_scheme": "Mirae Asset ELSS Tax Saver Fund",
     },
     {
         "query":        "What is the minimum SIP amount for Mirae Asset ELSS?",
         "expect_type":  "answer",
         "check_source": True,
         "description":  "Factual — minimum SIP (ELSS)",
+        "expect_scheme": "Mirae Asset ELSS Tax Saver Fund",
     },
     {
         "query":        "What is the benchmark index for Mirae Asset Liquid Fund?",
         "expect_type":  "answer",
         "check_source": True,
         "description":  "Factual — benchmark (Liquid Fund)",
+        "expect_scheme": "Mirae Asset Liquid Fund",
     },
     {
         "query":        "What is the riskometer rating of Mirae Asset Flexi Cap Fund?",
         "expect_type":  "answer",
         "check_source": True,
         "description":  "Factual — riskometer (Flexi Cap)",
+        "expect_scheme": "Mirae Asset Flexi Cap Fund",
     },
 
     # --- Guard rails — Phase 3 should block before reaching Phase 4 ---
@@ -117,6 +122,8 @@ def _check_answer(result: dict, test: dict) -> tuple:
 
     if t == "answer":
         text = result.get("text", "")
+        if "expect_scheme" in test and result.get("scheme") != test["expect_scheme"]:
+            failures.append(f"expected scheme={test['expect_scheme']!r}, got {result.get('scheme')!r}")
         # Non-empty answer
         if not text:
             failures.append("answer text is empty")
