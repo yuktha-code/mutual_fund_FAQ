@@ -38,26 +38,31 @@ TESTS = [
         "query":       "What is the exit load for Mirae Asset Large Cap Fund?",
         "expect_type": "answer",
         "description": "Factual — exit load (Large Cap)",
+        "expect_scheme": "Mirae Asset Large Cap Fund",
     },
     {
         "query":       "What is the lock-in period for Mirae Asset ELSS Tax Saver Fund?",
         "expect_type": "answer",
         "description": "Factual — lock-in (ELSS)",
+        "expect_scheme": "Mirae Asset ELSS Tax Saver Fund",
     },
     {
         "query":       "What is the minimum SIP amount for Mirae Asset ELSS?",
         "expect_type": "answer",
         "description": "Factual — min SIP (ELSS)",
+        "expect_scheme": "Mirae Asset ELSS Tax Saver Fund",
     },
     {
         "query":       "What is the benchmark index for Mirae Asset Liquid Fund?",
         "expect_type": "answer",
         "description": "Factual — benchmark (Liquid)",
+        "expect_scheme": "Mirae Asset Liquid Fund",
     },
     {
         "query":       "What is the riskometer rating of Mirae Asset Flexi Cap Fund?",
         "expect_type": "answer",
         "description": "Factual — riskometer (Flexi Cap)",
+        "expect_scheme": "Mirae Asset Flexi Cap Fund",
     },
 
     # --- Advisory queries — expect type='refusal', reason='advisory' ---
@@ -120,7 +125,9 @@ def main():
         if "expect_reason" in test:
             reason_ok = result.get("reason", "") == test["expect_reason"]
 
-        ok = type_ok and reason_ok
+        actual_scheme = result.get("primary_scheme") or result.get("scheme")
+        scheme_ok = ("expect_scheme" not in test) or (actual_scheme == test["expect_scheme"])
+        ok = type_ok and reason_ok and scheme_ok
         status = "PASS" if ok else "FAIL"
 
         if ok:
@@ -140,6 +147,8 @@ def main():
         print(f"        type={t!r}  {detail}")
         if not type_ok:
             print(f"        ↳ FAIL: expected type={test['expect_type']!r}, got {t!r}")
+        if not scheme_ok:
+            print(f"        ↳ FAIL: expected scheme={test['expect_scheme']!r}, got {actual_scheme!r}")
         if not reason_ok:
             print(f"        ↳ FAIL: expected reason={test['expect_reason']!r}, got {result.get('reason')!r}")
         print()
@@ -150,7 +159,8 @@ def main():
             "status":     status,
             "type":       t,
             "reason":     result.get("reason"),
-            "scheme":     result.get("primary_scheme"),
+            "scheme":     result.get("primary_scheme") or result.get("scheme"),
+            "scheme_match": scheme_ok,
             "chunks":     result.get("chunks_used"),
         })
 
